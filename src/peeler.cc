@@ -87,7 +87,7 @@ void Peeler::process(DescentGraph* dg) {
         TraitRfunction& rf = rfunctions.back();
         
         double prob = log(rf.get_result()) - \
-                      dg->get_recombination_prob(locus, false) - \
+                      dg->get_recombination_prob(map, locus, false) - \
                       dg->get_marker_transmission();
         
         lod->add(locus, i, prob);

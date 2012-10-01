@@ -142,8 +142,8 @@ int DescentGraph::get_founderallele(unsigned person_id, unsigned locus, enum par
     }
 }
 
-double DescentGraph::get_likelihood() {
-    prob = log_product(_transmission_prob(), _sum_prior_prob());
+double DescentGraph::get_likelihood(GeneticMap* m) {
+    prob = log_product(_transmission_prob(m), _sum_prior_prob(m));
     //prob = _transmission_prob();
     return prob;
 }
@@ -153,30 +153,31 @@ double DescentGraph::get_haplotype_likelihood() {
     return prob;
 }
 */
-double DescentGraph::_transmission_prob() {
-    return marker_transmission + _recombination_prob();
+double DescentGraph::_transmission_prob(GeneticMap* m) {
+    return marker_transmission + _recombination_prob(m);
 }
 
-double DescentGraph::_recombination_prob() {
+double DescentGraph::_recombination_prob(GeneticMap* m) {
     double tmp = 0.0;
     
     recombinations = 0;
 	
-	for(unsigned i = 0; i < (map->num_markers() - 1); ++i) { // every loci	
-        tmp += get_recombination_prob(i, true);
+    #pragma omp parallel for reduction(+:tmp)
+	for(int i = 0; i < int(m->num_markers() - 1); ++i) { // every loci
+        tmp += get_recombination_prob(m, i, true);
     }
     
     return tmp;
 }
 
-double DescentGraph::get_recombination_prob(unsigned locus, bool count_crossovers) {
+double DescentGraph::get_recombination_prob(GeneticMap* m, unsigned locus, bool count_crossovers) {
     double tmp = 0.0;
 	enum parentage parent;
 	bool crossover;
 	Person* p;
 	
-    double theta = map->get_theta_log(locus);
-    double antitheta = map->get_inversetheta_log(locus);
+    double theta = m->get_theta_log(locus);
+    double antitheta = m->get_inversetheta_log(locus);
 	    
     for(unsigned i = 0; i < ped->num_members(); ++i) { // every person
         p = ped->get_by_index(i);
@@ -199,14 +200,14 @@ double DescentGraph::get_recombination_prob(unsigned locus, bool count_crossover
     return tmp;
 }
 
-double DescentGraph::_sum_prior_prob() {
+double DescentGraph::_sum_prior_prob(GeneticMap* m) {
     double tmp_prob;
 	double return_prob = 0.0;
-    FounderAlleleGraph4 f(ped, map);
+    FounderAlleleGraph4 f(ped, m);
     
     f.set_sequence(&seq);
     
-    for(unsigned i = 0; i < map->num_markers(); ++i) {
+    for(unsigned i = 0; i < m->num_markers(); ++i) {
         f.set_locus(i);
         f.reset(*this);
         

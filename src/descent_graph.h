@@ -26,10 +26,10 @@ class DescentGraph {
 	vector<int> seq;
 	
     
-	double _transmission_prob();
-	double _recombination_prob();
+	double _transmission_prob(GeneticMap* m);
+	double _recombination_prob(GeneticMap* m);
     double _best_prior_prob();
-	double _sum_prior_prob();
+	double _sum_prior_prob(GeneticMap* m);
     //int _offset(unsigned person_id, unsigned locus, enum parentage p) const ;
 	inline int _offset(unsigned person_id, unsigned locus, enum parentage p) const {
 	    return (graph_size * locus) + (person_id * 2) + p;
@@ -67,9 +67,9 @@ class DescentGraph {
 	int num_recombinations() const { return recombinations; }
     double get_prob() const { return prob; }
 	double get_marker_transmission() const { return marker_transmission; }
-	double get_recombination_prob(unsigned int locus, bool count_crossovers);
+	double get_recombination_prob(GeneticMap* m, unsigned int locus, bool count_crossovers);
     double get_haplotype_likelihood();
-    double get_likelihood();
+    double get_likelihood(GeneticMap* m);
     
     string debug_string();
     

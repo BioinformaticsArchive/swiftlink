@@ -97,6 +97,19 @@ class GeneticMap {
         temperature(0.0),
         partial_theta_count(partial_theta_count) {}
     
+    // the assumption is that rhs is at temperature 0.0
+    // otherwise set_temperature will call abort()
+    GeneticMap(GeneticMap& rhs, double temperature) :
+        map(rhs.map),
+        thetas(rhs.thetas),
+        inversethetas(rhs.inversethetas),
+        partial_thetas(rhs.partial_thetas),
+        temperature(rhs.temperature),
+        partial_theta_count(rhs.partial_theta_count) {
+        
+        set_temperature(temperature);
+    }
+    
     ~GeneticMap() {}
     
 	Snp& operator[](int i) {

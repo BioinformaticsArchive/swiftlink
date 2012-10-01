@@ -56,14 +56,20 @@ void PeelSequenceGenerator::find_prev_functions(PeelOperation& op) {
     vector<unsigned> tmp(op.get_cutset());
     tmp.push_back(op.get_peelnode());
     
+    //fprintf(stderr, "%d: ", op.get_cutset_size());
+    
     while(1) {
         int pf = find_function_containing(tmp);
         
         if(pf == -1)
             break;
             
+        //fprintf(stderr, "%d, ", peelorder[pf].get_cutset_size());
+            
         op.add_prevfunction(pf);
     }
+    
+    //fprintf(stderr, "\n");
 }
 
 int PeelSequenceGenerator::find_function_containing(vector<unsigned>& nodes) {
